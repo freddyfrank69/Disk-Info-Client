@@ -119,7 +119,7 @@ public class Main {
 
                 infoText.append("All Drive: \n");
                 infoText.append("Drive ").append(driveLetter).append(" \nSerial Number: ").append(diskInfo.getSerialNumber()).append("\n");
-                infoText.append("Disk Name: ").append(diskInfo.getDiskName()).append("\n");
+                infoText.append("Disk Name: ").append(root).append("\n");
                 infoText.append("File System: ").append(diskInfo.getFileSystem()).append("\n");
                 infoText.append("Total Space: ").append(String.format("%.2f", totalSpaceGB)).append(" GB\n");
                 infoText.append("Used Space: ").append(String.format("%.2f", usedSpaceGB)).append(" GB\n");
@@ -163,7 +163,7 @@ public class Main {
         double usedSpaceGB = diskInfo.getUsedSpace() / Math.pow(1024, 3);
         double availableSpaceGB = diskInfo.getAvailableSpace() / Math.pow(1024, 3);
 
-        String infoText = "Disk Name: " + diskInfo.getDiskName() + "\n" +
+        String infoText = "Disk Letter: " + diskInfo.getDiskName() + "\n" +
                 "Serial Number: " + diskInfo.getSerialNumber() + "\n" +
                 "File System: " + diskInfo.getFileSystem() + "\n" +
                 "Total Space: " + String.format("%.2f", totalSpaceGB) + " GB\n" +
