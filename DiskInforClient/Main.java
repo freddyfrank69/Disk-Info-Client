@@ -7,23 +7,31 @@ import java.net.*;
 public class Main {
     private JFrame frame;
     private JTextField driveTextField;
+    private JTextField ipTextField;
+    private JTextField portTextField;
     private JTextArea infoTextArea;
 
     public Main() {
         frame = new JFrame("Disk Info Client");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(450, 350);
-        frame.setLayout(new FlowLayout());
+        frame.setSize(680, 370);
+        frame.setLayout(new BorderLayout());
+
+        JPanel propertiesPanel = new JPanel();
+        propertiesPanel.setLayout(new FlowLayout());
 
         driveTextField = new JTextField(5);
-        infoTextArea = new JTextArea(15, 35);
-        infoTextArea.setEditable(false);
+        ipTextField = new JTextField(15);
+        portTextField = new JTextField(5);
 
         JButton searchButton = new JButton("Search");
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String driveLetter = driveTextField.getText();
+                String ipAddress = ipTextField.getText();
+                int port = Integer.parseInt(portTextField.getText());
+
                 if (driveLetter.equalsIgnoreCase("All")) {
                     getAllDiskInfo();
                 } else if (driveLetter.length() == 1) {
@@ -34,17 +42,45 @@ public class Main {
             }
         });
 
-        frame.add(new JLabel("Enter Drive Letter (or 'All'): "));
-        frame.add(driveTextField);
-        frame.add(searchButton);
-        frame.add(new JLabel("Disk Information: "));
-        frame.add(new JScrollPane(infoTextArea));
+        propertiesPanel.add(new JLabel("Enter Drive Letter (or 'All'): "));
+        propertiesPanel.add(driveTextField);
+        propertiesPanel.add(new JLabel("IP Address: "));
+        propertiesPanel.add(ipTextField);
+        propertiesPanel.add(new JLabel("Port: "));
+        propertiesPanel.add(portTextField);
+        propertiesPanel.add(searchButton);
+
+        JPanel diskInfoPanel = new JPanel();
+        diskInfoPanel.setLayout(new BorderLayout());
+
+        JPanel centerLabelPanel = new JPanel();
+        centerLabelPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        centerLabelPanel.add(new JLabel("Disk Information: "));
+
+        diskInfoPanel.add(centerLabelPanel, BorderLayout.NORTH);
+
+        infoTextArea = new JTextArea(15, 55);
+        infoTextArea.setEditable(false);
+
+        JPanel textAreaPanel = new JPanel(new BorderLayout());
+        textAreaPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding
+
+        JScrollPane scrollPane = new JScrollPane(infoTextArea);
+        textAreaPanel.add(scrollPane, BorderLayout.CENTER);
+
+        diskInfoPanel.add(textAreaPanel, BorderLayout.CENTER);
+
+        frame.add(propertiesPanel, BorderLayout.NORTH);
+        frame.add(diskInfoPanel, BorderLayout.CENTER);
+
         frame.setVisible(true);
     }
 
     private void getInfoForDrive(String driveLetter) {
         try {
-            Socket socket = new Socket("localhost", 12345);
+            String ipAddress = ipTextField.getText(); // Get the entered IP address
+            int port = Integer.parseInt(portTextField.getText()); // Get the entered port
+            Socket socket = new Socket(ipAddress, port);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
@@ -63,6 +99,7 @@ public class Main {
             in.close();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+            infoTextArea.setText("Connection failed");
         }
     }
     private static long sectorSize = 512; // Typical sector size in bytes
@@ -99,7 +136,9 @@ public class Main {
 
     private DiskInfo getDiskInfoForDrive(String driveLetter) {
         try {
-            Socket socket = new Socket("localhost", 12345);
+            String ipAddress = ipTextField.getText();
+            int port = Integer.parseInt(portTextField.getText());
+            Socket socket = new Socket(ipAddress, port);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
